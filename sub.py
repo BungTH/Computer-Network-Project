@@ -1,12 +1,33 @@
 import paho.mqtt.client as mqtt
 #import pandas as pd
 import time
+import connectDB
 import random
 
 payload1 = "1"
 payload2 = "2"
 payload = "3"
 i = 0
+
+client_id = str(random.randint(1000, 9999))
+db = connectDB.connectDB(client_id)
+db.createTable()
+
+#use to seperate to time hum, temp, thermal
+def seperateWord(payload):
+    string = payload.split()
+    dsenTime = string[0] + " " +string[1]
+    d2senTime = dsenTime.split("'")
+    senTime = d2senTime[1]
+    hum = string[2]
+    temp = string[3]
+    thermal = string[4]
+    #change to float
+    hum = float(hum)
+    temp = float(temp)
+
+    return senTime, hum, temp, thermal
+
 # setting callbacks for different events to see if it works, print the message etc.
 def on_connect(client, userdata, flags, rc):
     print("CONNACK received with code %s." % rc)
@@ -17,21 +38,19 @@ def on_message(client, userdata, msg):
     global payload
     global i
     global payload2
+    global db
    # print(msg.topic + " " + str(msg.qos) + " " + str(msg.payload))
     if i == 0:
         payload1 = str(msg.payload)
         i = i+1
     else:
-        payload2 = str(msg.payload)
-        payload = payload1 + payload2
-        print(payload)
+        dpayload2 = str(msg.payload)
+        payload2 = dpayload2.split("'")
+        payload = payload1 + payload2[1]
+        senTime,hum,temp,thermal = seperateWord(payload)
+        db.insertInto(senTime,hum,temp,thermal)
         i = 0
 
-# Read the data from the excel file
-excel_file = "SampleInput.xlsx"
-#data = pd.read_excel(excel_file)
-
-client_id = str(random.randint(1000, 9999))
 # Create a MQTT client instancepip3 install pandas
 client = mqtt.Client(client_id)
 client.on_connect = on_connect
