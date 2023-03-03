@@ -55,10 +55,10 @@ client.on_log = on_log
 
 # Publish each row of the data
 for index, row in data.iterrows():
-    payload = f"{row['Time']} {row['Humidity']} {row['Temperature']} {row['ThermalArray']}"
+    payload = f"{row['Time']} {row['Humidity']} {row['Temperature']} {row['ThermalArray']} {client_id} {row['Time']}"
     payload_tmp = payload
     payload_split = split_string_by_byte_size(payload_tmp, max_payload_size)
-    topic = "BungkapTH/Device"
+    topic = "Device/" + client_id
     for i in range(len(payload_split)):
         client.publish(topic, payload_split[i])
         time.sleep(1)
