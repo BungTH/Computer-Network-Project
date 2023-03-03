@@ -13,6 +13,12 @@ client_id = str(random.randint(1000, 9999))
 db = connectDB.connectDB(client_id)
 db.createTable()
 
+#use to create ui and recive input from user
+def ui(client_id):
+    print("This is server "+client_id)
+    print("1) print all data")
+    print("4) clsoe server")
+
 #use to seperate to time hum, temp, thermal
 def seperateWord(payload):
     string = payload.split()
@@ -65,9 +71,12 @@ topic = "BungkapTH/Device"
 client.subscribe(topic)
 # Disconnect from the MQTT broker
 client.loop_start()
-while(1):
-    client.on_message = on_message
+exit = 0
+while(exit == 0):
     x = input()
-    if (x == "s"):
-        break;
+    client.on_message = on_message
+    ui(client_id)
+    if (x == 4):
+        exit = 1
+
 client.loop_stop()

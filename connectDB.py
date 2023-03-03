@@ -35,3 +35,7 @@ class connectDB:
         command.execute(query, values)
         db.commit()
 
+    def printAllData(self):
+        db = self.connectDatabase()
+        command = db.cursor(prepared=True)
+
